@@ -1,7 +1,5 @@
-// src/auth/auth.service.ts
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable} from '@nestjs/common';
 import { UsersService } from '../users/users.service';
-import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ResponseDto } from '../common/dto/response.dto/response.dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
@@ -24,25 +22,15 @@ export class AuthService {
   );
 }
 
-  async login(loginUserDto: LoginUserDto) {
-    const {name, email, password } = loginUserDto;
-    const user = await this.usersService.findByEmail(email);
-    if (!user) {
-      throw new UnauthorizedException('User does not exist with given email');
-    }
-
-    const passwordValid = await bcrypt.compare(password, user.password);
-    if (!passwordValid) {
-      throw new UnauthorizedException('Invalid Credentials');
-      
-    }
+  async login(loginUserDto: LoginUserDto & { user: any }) {
+    const { user } = loginUserDto;
 
     const payload = { sub: user.id, email: user.email };
     const token = await this.jwtService.signAsync(payload);
 
     return new ResponseDto(
       'success',
-      { access_token: token },
+      { access_token: token, userId: user.id },
       'User Login Successful',
     );
   }

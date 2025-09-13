@@ -16,7 +16,7 @@ model users {
   email       String   @db.VarChar(255)
   //role_id     String?
   created_on  DateTime 
-  created_by  String?
+  created_by  String?   
   updated_on  DateTime @updatedAt
   updated_by  String?
 
@@ -32,9 +32,46 @@ model posts {
   content     String
   is_deleted  Boolean
   user_id     String
-  user        users    @relation(fields: [user_id], references: [id])  // fixed relation
+  user        users    @relation(fields: [user_id], references: [id])
   created_on  DateTime
-  created_by  String?
-  updated_on  DateTime @updatedAt
+  created_by  String
+  updated_on  DateTime? @updatedAt
   updated_by  String?
 }
+
+model roles {
+  id          String      @id @default(uuid())
+  role_name   String      @db.VarChar(255)
+  created_on  DateTime?   @default(now())
+  created_by  String?     
+  updated_on  DateTime?   @updatedAt
+  updated_by  String      
+  
+  roleScopes  roles_scopes[]
+}
+
+model scopes {
+  id          String      @id @default(uuid())
+  module      String      @db.VarChar(255)
+  action      String      @db.VarChar(255)
+  scope_text  String
+  created_on  DateTime?   @default(now())
+  created_by  String?
+  updated_on  DateTime?   @updatedAt
+  updated_by  String?
+
+  roleScopes  roles_scopes[]
+}
+
+model roles_scopes {
+  id          String   @id @default(uuid())
+  role        roles    @relation(fields: [role_id], references: [id])
+  role_id     String
+  scope       scopes   @relation(fields: [scope_id], references: [id])
+  scope_id    String
+  created_on  DateTime? @default(now())
+  created_by  String?
+  updated_on  DateTime? @updatedAt
+  updated_by  String?
+}
+

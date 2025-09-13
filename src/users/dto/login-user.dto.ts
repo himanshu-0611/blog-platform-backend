@@ -2,10 +2,6 @@ import { IsEmail, IsNotEmpty, IsString, MinLength, Validate } from 'class-valida
 
 export class LoginUserDto {
   @IsNotEmpty()
-  @IsString()
-  name: string;
-
-  @IsNotEmpty()
   @IsEmail()
   email: string;
 

@@ -1,5 +1,5 @@
 import { IsEmail, IsNotEmpty, IsString, MinLength, Validate } from 'class-validator';
-import { CreateUserValidator } from '../validators/create-user.validator/create-user.validator';
+import { CreateUserValidator } from '../validators/create-user.validator';
 
 export class CreateUserDto {
   @IsNotEmpty()
