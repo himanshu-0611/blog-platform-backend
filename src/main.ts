@@ -19,6 +19,8 @@ async function bootstrap() {
     }),
   );
 
+  app.setGlobalPrefix('blog-platoform-be/v1');
+
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

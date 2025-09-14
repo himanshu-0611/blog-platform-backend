@@ -13,6 +13,6 @@ export class UsersController {
   @UsePipes(DeleteUserValidationPipe)
   async deleteUser(@Param('id') id: string) {
     await this.usersService.delete(id);
-    return new ResponseDto('success', null, `User ${id} deleted successfully`);
+    return new ResponseDto('success', {}, `User ${id} deleted successfully`);
   }
 }
