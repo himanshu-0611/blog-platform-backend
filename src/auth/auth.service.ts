@@ -1,4 +1,4 @@
-import { Injectable} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ResponseDto } from '../common/dto/response.dto/response.dto';
@@ -13,14 +13,14 @@ export class AuthService {
   ) {}
 
   async signup(createUserDto: CreateUserDto) {
-  const { name, email, password } = createUserDto;
-  const user = await this.usersService.create(name, email, password);
-  return new ResponseDto(
-    'success',
-    { userId: user.id },
-    'User Registered Successfully',
-  );
-}
+    const { name, email, password } = createUserDto;
+    const user = await this.usersService.create(name, email, password);
+    return new ResponseDto(
+      'success',
+      { userId: user.id },
+      'User Registered Successfully',
+    );
+  }
 
   async login(loginUserDto: LoginUserDto & { user: any }) {
     const { user } = loginUserDto;

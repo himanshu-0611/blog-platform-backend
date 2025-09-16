@@ -1,7 +1,9 @@
 import {
+  Body,
   Controller,
   Delete,
   Param,
+  Post,
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
@@ -27,6 +29,26 @@ export class UsersController {
       'success',
       {},
       `User ${id} deleted successfully by ${user.email}`,
+    );
+  }
+  @UseGuards(AuthGuard('jwt'), ScopesGuard)
+  @Scope('users:CHANGE_ROLE:change_role')
+  @Post('change-role')
+  async changeUserRole(
+    @Body('userId') userId: string,
+    @Body('roleName') roleName: string,
+    @CurrentUser() currentUser: any,
+  ) {
+    const updatedUser = await this.usersService.changeUserRole(
+      userId,
+      roleName,
+      currentUser.id,
+    );
+
+    return new ResponseDto(
+      'success',
+      updatedUser,
+      `User ${userId}'s role changed to ${roleName} by ${currentUser.email}`,
     );
   }
 }

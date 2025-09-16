@@ -25,13 +25,15 @@ export class AllExceptionsFilter implements ExceptionFilter {
       message = 'Internal server error';
     }
 
-    response.status(status).json(
-      new ResponseDto(
-        'failure',
-        [],
-        Array.isArray(message) ? message.join(', ') : message,
-        true,
-      ),
-    );
+    response
+      .status(status)
+      .json(
+        new ResponseDto(
+          'failure',
+          [],
+          Array.isArray(message) ? message.join(', ') : message,
+          true,
+        ),
+      );
   }
 }

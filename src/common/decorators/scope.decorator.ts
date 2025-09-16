@@ -1,3 +1,3 @@
 import { SetMetadata } from '@nestjs/common';
 
-export const Scope = (scope: string) => SetMetadata('scope', scope);
+export const Scope = (scope: string | string[]) => SetMetadata('scope', scope);

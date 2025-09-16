@@ -9,7 +9,14 @@ import { CommonModule } from './common/common.module';
 import { RolesModule } from './roles/roles.module';
 
 @Module({
-  imports: [UsersModule, PostsModule, AuthModule, PrismaModule, CommonModule, RolesModule],
+  imports: [
+    UsersModule,
+    PostsModule,
+    AuthModule,
+    PrismaModule,
+    CommonModule,
+    RolesModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -1,5 +1,5 @@
 // src/users/users.service.ts
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 
@@ -10,14 +10,27 @@ export class UsersService {
   async create(name: string, email: string, password: string) {
     const hashed = await bcrypt.hash(password, 10);
 
+    // 1. Fetch Member role
+    const memberRole = await this.prisma.roles.findFirst({
+      where: { role_name: 'Member' },
+    });
+
+    if (!memberRole) {
+      throw new NotFoundException(
+        'Default role "Member" not found. Please seed roles first.',
+      );
+    }
+
+    // 2. Create user with Member role_id
     return this.prisma.users.create({
       data: {
         name,
         email,
         password: hashed,
+        role_id: memberRole.id,
         is_active: true,
         is_archive: false,
-        created_on: new Date()
+        created_on: new Date(),
       },
     });
   }
@@ -34,5 +47,60 @@ export class UsersService {
       data: { is_active: false, is_archive: true },
     });
     return deletedUser;
+  }
+
+  async promoteToSuperUser(userId: string, promoterId: string) {
+    const superUserRole = await this.prisma.roles.findFirst({
+      where: { role_name: 'Super User' },
+    });
+
+    if (!superUserRole) {
+      throw new NotFoundException('Super User role not found.');
+    }
+
+    return this.prisma.users.update({
+      where: { id: userId },
+      data: {
+        role_id: superUserRole.id,
+        updated_on: new Date(),
+        updated_by: promoterId,
+      },
+      include: {
+        role: true,
+      },
+    });
+  }
+
+  async changeUserRole(userId: string, roleName: string, changerId: string) {
+    const targetRole = await this.prisma.roles.findFirst({
+      where: { role_name: roleName },
+    });
+
+    if (!targetRole) {
+      throw new NotFoundException(`Role "${roleName}" not found.`);
+    }
+
+    const user = await this.prisma.users.findUnique({
+      where: { id: userId },
+      include: { role: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with id ${userId} not found.`);
+    }
+
+    if (user.role?.role_name === roleName) {
+      throw new Error(`User is already a ${roleName}.`);
+    }
+
+    return this.prisma.users.update({
+      where: { id: userId },
+      data: {
+        role_id: targetRole.id,
+        updated_on: new Date(),
+        updated_by: changerId,
+      },
+      include: { role: true },
+    });
   }
 }

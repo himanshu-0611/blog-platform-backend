@@ -7,20 +7,16 @@ import {
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
-export class DeleteUserValidationPipe implements PipeTransform {
+export class DeletePostPipe implements PipeTransform {
   constructor(private prisma: PrismaService) {}
 
   async transform(value: string, metadata: ArgumentMetadata) {
-    if (metadata.type !== 'param') return value;
-
-    const user = await this.prisma.users.findUnique({
+    const post = await this.prisma.posts.findUnique({
       where: { id: value },
     });
 
-    if (!user || !user.is_active || user.is_archive) {
-      throw new NotFoundException(
-        `Active user with id ${value} does not exist`,
-      );
+    if (!post || post.is_deleted) {
+      throw new NotFoundException(`Post with id ${value} does not exist`);
     }
 
     return value;
