@@ -40,7 +40,7 @@ export class PostsController {
   }
 
   @UseGuards(AuthGuard('jwt'), ScopesGuard)
-  @Scope('posts:DELETE:delete_any_post') // Admin can delete any post
+  @Scope('posts:DELETE:delete_any_post')
   @Delete(':id')
   async deletePostAny(@Param('id') id: string, @CurrentUser() user: any) {
     return new ResponseDto(
@@ -51,7 +51,7 @@ export class PostsController {
   }
 
   @UseGuards(AuthGuard('jwt'), ScopesGuard)
-  @Scope('posts:DELETE:delete_own_post') // Member can delete only their own post
+  @Scope('posts:DELETE:delete_own_post')
   @Delete('own/:id')
   async deleteOwnPost(@Param('id') id: string, @CurrentUser() user: any) {
     return new ResponseDto(
@@ -61,9 +61,9 @@ export class PostsController {
     );
   }
 
-  @Post('paginated')
+  @Post('get_posts')
   async getPaginatedPosts(@Body() dto: PaginatedPostsDto) {
-    const { data, total, totalPages } =
+    const { data, total, totalPages, message } =
       await this.postsService.getPaginatedPosts(dto);
 
     return new ResponseDto(
@@ -75,10 +75,10 @@ export class PostsController {
         total_items: total,
         data,
       },
-      `Fetched page ${dto.page_number} of posts successfully`,
+      message,
     );
   }
-  
+
   @UseGuards(AuthGuard('jwt'), ScopesGuard)
   @Scope('posts:EDIT:edit_post')
   @Put(':id')
@@ -89,10 +89,6 @@ export class PostsController {
   ) {
     const updated = await this.postsService.updatePost(id, user, updatePostDto);
 
-    return new ResponseDto(
-      'success',
-      updated,
-      `Post edited successfully`,
-    );
+    return new ResponseDto('success', updated, `Post edited successfully`);
   }
 }

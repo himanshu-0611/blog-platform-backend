@@ -51,16 +51,36 @@ export class PostsService {
     });
   }
 
-  async getPaginatedPosts(dto: { page_size: number; page_number: number }) {
+  async getPaginatedPosts(dto: {
+    page_size: number;
+    page_number: number;
+    search_by_title?: string;
+    search_by_content?: string;
+  }) {
     const skip = (dto.page_number - 1) * dto.page_size;
     const take = dto.page_size;
 
-    const total = await this.prisma.posts.count({
-      where: { is_deleted: false },
-    });
+    const where: any = { is_deleted: false };
+
+    if (dto.search_by_title || dto.search_by_content) {
+      where.OR = [];
+
+      if (dto.search_by_title) {
+        where.OR.push({
+          title: { contains: dto.search_by_title, mode: 'insensitive' },
+        });
+      }
+      if (dto.search_by_content) {
+        where.OR.push({
+          content: { contains: dto.search_by_content, mode: 'insensitive' },
+        });
+      }
+    }
+
+    const total = await this.prisma.posts.count({ where });
 
     const data = await this.prisma.posts.findMany({
-      where: { is_deleted: false },
+      where,
       select: {
         id: true,
         title: true,
@@ -81,8 +101,12 @@ export class PostsService {
     });
 
     const totalPages = Math.ceil(total / dto.page_size);
+    const message =
+      total === 0
+        ? 'No Posts Available'
+        : `Fetched page ${dto.page_number} of posts successfully`;
 
-    return { data, total, totalPages };
+    return { data, total, totalPages, message };
   }
   async updatePost(postId: string, user: any, updatePostDto: any) {
     const post = await this.prisma.posts.findUnique({ where: { id: postId } });

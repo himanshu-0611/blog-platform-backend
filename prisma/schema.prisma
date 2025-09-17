@@ -75,3 +75,19 @@ model roles_scopes {
   updated_on DateTime? @updatedAt
   updated_by String?
 }
+
+model system_logs {
+  id               String   @id @default(uuid())
+  endpoint         String
+  request_headers  String
+  request_body     String
+  response_headers String
+  response_body    String
+  status_code      String?
+  is_errorenous    Boolean  @default(false)
+  exception        String?  
+  created_on       DateTime @default(now())
+  created_by       String?
+  updated_on       DateTime @updatedAt
+  updated_by       String?
+}
