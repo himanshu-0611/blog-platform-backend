@@ -2,12 +2,12 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
   Param,
   Post,
   Put,
   UseGuards,
   UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ResponseDto } from 'src/common/dto/response.dto/response.dto';
 import { ScopesGuard } from 'src/common/guards/scopes.guard';
@@ -19,7 +19,7 @@ import { AddPostDto } from './dto/add-post.dto';
 import { PaginatedPostsDto } from './dto/paginated-posts.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { AddPostPipe } from './pipes/add-post.pipe';
-import { DeletePostPipe } from './pipes/delete-post.pipe';
+import { EditPostValidationPipe } from './pipes/edit-post.pipe';
 
 @Controller('posts')
 export class PostsController {
@@ -61,8 +61,10 @@ export class PostsController {
     );
   }
 
+  @UseGuards(AuthGuard('jwt'), ScopesGuard)
+  @Scope('posts:GET:get_all_posts')
   @Post('get_posts')
-  async getPaginatedPosts(@Body() dto: PaginatedPostsDto) {
+  async getPaginatedPosts(@Body(ValidationPipe) dto: PaginatedPostsDto) {
     const { data, total, totalPages, message } =
       await this.postsService.getPaginatedPosts(dto);
 
@@ -79,16 +81,15 @@ export class PostsController {
     );
   }
 
+  @Put(':id')
   @UseGuards(AuthGuard('jwt'), ScopesGuard)
   @Scope('posts:EDIT:edit_post')
-  @Put(':id')
   async updatePost(
-    @Param('id') id: string,
+    @Param('id', EditPostValidationPipe) id: string,
     @CurrentUser() user: any,
     @Body() updatePostDto: UpdatePostDto,
   ) {
     const updated = await this.postsService.updatePost(id, user, updatePostDto);
-
     return new ResponseDto('success', updated, `Post edited successfully`);
   }
 }

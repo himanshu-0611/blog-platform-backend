@@ -12,6 +12,7 @@ import { UsersService } from './users.service';
 import { AuthGuard } from '@nestjs/passport';
 import { ResponseDto } from '../common/dto/response.dto/response.dto';
 import { DeleteUserValidationPipe } from './pipes/delete-user-validation.pipe';
+import { ChangeUserRoleValidationPipe } from './pipes/change-user-role-validation.pipe';
 import { Scope } from '../common/decorators/scope.decorator';
 import { ScopesGuard } from '../common/guards/scopes.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -25,7 +26,7 @@ export class UsersController {
   @Delete(':id')
   @UsePipes(DeleteUserValidationPipe)
   async deleteUser(@Param('id') id: string, @CurrentUser() user: any) {
-    await this.usersService.delete(id);
+    await this.usersService.deleteUser(id);
     return new ResponseDto(
       'success',
       {},
@@ -35,11 +36,13 @@ export class UsersController {
   @UseGuards(AuthGuard('jwt'), ScopesGuard)
   @Scope('users:CHANGE_ROLE:change_role')
   @Post('change-role')
+  @UsePipes(ChangeUserRoleValidationPipe)
   async changeUserRole(
-    @Body('userId') userId: string,
-    @Body('roleName') roleName: string,
+    @Body() validatedData: any,
     @CurrentUser() currentUser: any,
   ) {
+    const { userId, roleName, targetRole } = validatedData;
+
     const updatedUser = await this.usersService.changeUserRole(
       userId,
       roleName,
@@ -49,7 +52,7 @@ export class UsersController {
     return new ResponseDto(
       'success',
       updatedUser,
-      `User ${userId}'s role changed to ${roleName} by ${currentUser.email}`,
+      `User role changed to ${targetRole.role_name}.`,
     );
   }
   @UseGuards(AuthGuard('jwt'), ScopesGuard)

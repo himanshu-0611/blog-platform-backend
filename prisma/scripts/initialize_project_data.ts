@@ -84,12 +84,22 @@ async function main() {
     },
   });
 
-  // 🔑 New Scope: Edit Post
   const editPostScope = await prisma.scopes.create({
     data: {
       action: 'EDIT',
       module: 'posts',
       scope_text: 'edit_post',
+      created_on: new Date(),
+      created_by: 'system',
+    },
+  });
+
+  // 🔑 New Scope: Get All Posts
+  const getAllPostsScope = await prisma.scopes.create({
+    data: {
+      action: 'GET',
+      module: 'posts',
+      scope_text: 'get_all_posts',
       created_on: new Date(),
       created_by: 'system',
     },
@@ -119,12 +129,14 @@ async function main() {
       { role_id: superUserRole.id, scope_id: deleteAnyPostScope.id, created_by: 'system' },
       { role_id: superUserRole.id, scope_id: deleteOwnPostScope.id, created_by: 'system' },
       { role_id: superUserRole.id, scope_id: getAllUsersScope.id, created_by: 'system' },
-      { role_id: superUserRole.id, scope_id: editPostScope.id, created_by: 'system' }, // 👈 new mapping
+      { role_id: superUserRole.id, scope_id: editPostScope.id, created_by: 'system' },
+      { role_id: superUserRole.id, scope_id: getAllPostsScope.id, created_by: 'system' }, // 👈 new mapping
 
       // Member
       { role_id: memberRole.id, scope_id: addPostScope.id, created_by: 'system' },
       { role_id: memberRole.id, scope_id: deleteOwnPostScope.id, created_by: 'system' },
-      { role_id: memberRole.id, scope_id: editPostScope.id, created_by: 'system' }, // 👈 new mapping
+      { role_id: memberRole.id, scope_id: editPostScope.id, created_by: 'system' },
+      { role_id: memberRole.id, scope_id: getAllPostsScope.id, created_by: 'system' }, // 👈 new mapping
     ],
   });
 

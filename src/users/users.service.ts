@@ -1,5 +1,8 @@
-// src/users/users.service.ts
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 
@@ -10,7 +13,6 @@ export class UsersService {
   async create(name: string, email: string, password: string) {
     const hashed = await bcrypt.hash(password, 10);
 
-    // 1. Fetch Member role
     const memberRole = await this.prisma.roles.findFirst({
       where: { role_name: 'Member' },
     });
@@ -21,7 +23,6 @@ export class UsersService {
       );
     }
 
-    // 2. Create user with Member role_id
     return this.prisma.users.create({
       data: {
         name,
@@ -41,7 +42,7 @@ export class UsersService {
     });
   }
 
-  async delete(id: string) {
+  async deleteUser(id: string) {
     const deletedUser = await this.prisma.users.update({
       where: { id },
       data: { is_active: false, is_archive: true },
@@ -54,22 +55,12 @@ export class UsersService {
       where: { role_name: roleName },
     });
 
-    if (!targetRole) {
-      throw new NotFoundException(`Role "${roleName}" not found.`);
-    }
-
     const user = await this.prisma.users.findUnique({
       where: { id: userId },
       include: { role: true },
     });
-
-    if (!user) {
-      throw new NotFoundException(`User with id ${userId} not found.`);
-    }
-
-    if (user.role?.role_name === roleName) {
-      throw new Error(`User is already a ${roleName}.`);
-    }
+    if (!targetRole) throw new BadRequestException(`Invalid role.`);
+    if (!user) throw new NotFoundException(`User not found.`);
 
     return this.prisma.users.update({
       where: { id: userId },
@@ -78,7 +69,18 @@ export class UsersService {
         updated_on: new Date(),
         updated_by: changerId,
       },
-      include: { role: true },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        is_active: true,
+        role: {
+          select: {
+            id: true,
+            role_name: true,
+          },
+        },
+      },
     });
   }
   async getAllUsers() {

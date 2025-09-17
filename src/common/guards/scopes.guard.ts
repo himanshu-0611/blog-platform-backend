@@ -1,4 +1,3 @@
-// src/common/guards/scopes.guard.ts
 import {
   Injectable,
   CanActivate,
@@ -44,7 +43,7 @@ export class ScopesGuard implements CanActivate {
     });
 
     if (!dbUser || !dbUser.role_id) {
-      throw new ForbiddenException('User is not eligible to take the action 1');
+      throw new ForbiddenException('User is not eligible to take the action');
     }
 
     // Get all scopes for that role
@@ -54,7 +53,7 @@ export class ScopesGuard implements CanActivate {
     });
 
     if (!roleScopes.length) {
-      throw new ForbiddenException('User is not eligible to take the action 2');
+      throw new ForbiddenException('User is not eligible to take the action');
     }
 
     const userScopes = roleScopes.map(
@@ -68,7 +67,7 @@ export class ScopesGuard implements CanActivate {
     console.log('🎯 User Scopes:', userScopes);
     console.log('✅ Match Found:', hasScope);
     if (!hasScope) {
-      throw new ForbiddenException('User is not eligible to take the action 3');
+      throw new ForbiddenException('User is not eligible to take the action');
     }
 
     // 🔑 Extra check: if scope ends with ":own", verify ownership
