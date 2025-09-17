@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -86,5 +83,24 @@ export class PostsService {
     const totalPages = Math.ceil(total / dto.page_size);
 
     return { data, total, totalPages };
+  }
+  async updatePost(postId: string, user: any, updatePostDto: any) {
+    const post = await this.prisma.posts.findUnique({ where: { id: postId } });
+
+    if (!post || post.is_deleted) {
+      throw new NotFoundException(`Post which is to be edited does not exist`);
+    }
+
+    if (post.user_id !== user.id) {
+      throw new Error('You are not allowed to edit this post');
+    }
+
+    return this.prisma.posts.update({
+      where: { id: postId },
+      data: {
+        ...updatePostDto,
+        updated_by: user.id,
+      },
+    });
   }
 }

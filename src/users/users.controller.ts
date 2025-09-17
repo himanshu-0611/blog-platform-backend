@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   Post,
   UseGuards,
@@ -49,6 +50,18 @@ export class UsersController {
       'success',
       updatedUser,
       `User ${userId}'s role changed to ${roleName} by ${currentUser.email}`,
+    );
+  }
+  @UseGuards(AuthGuard('jwt'), ScopesGuard)
+  @Scope('users:GET:get_all_users')
+  @Get()
+  async getAllUsers() {
+    const users = await this.usersService.getAllUsers();
+
+    return new ResponseDto(
+      'success',
+      users,
+      `Fetched ${users.length} users successfully.`,
     );
   }
 }

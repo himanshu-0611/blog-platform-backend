@@ -49,28 +49,6 @@ export class UsersService {
     return deletedUser;
   }
 
-  async promoteToSuperUser(userId: string, promoterId: string) {
-    const superUserRole = await this.prisma.roles.findFirst({
-      where: { role_name: 'Super User' },
-    });
-
-    if (!superUserRole) {
-      throw new NotFoundException('Super User role not found.');
-    }
-
-    return this.prisma.users.update({
-      where: { id: userId },
-      data: {
-        role_id: superUserRole.id,
-        updated_on: new Date(),
-        updated_by: promoterId,
-      },
-      include: {
-        role: true,
-      },
-    });
-  }
-
   async changeUserRole(userId: string, roleName: string, changerId: string) {
     const targetRole = await this.prisma.roles.findFirst({
       where: { role_name: roleName },
@@ -101,6 +79,23 @@ export class UsersService {
         updated_by: changerId,
       },
       include: { role: true },
+    });
+  }
+  async getAllUsers() {
+    return this.prisma.users.findMany({
+      where: { is_active: true, is_archive: false },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        created_on: true,
+        role: {
+          select: {
+            role_name: true,
+          },
+        },
+      },
+      orderBy: { created_on: 'desc' },
     });
   }
 }

@@ -8,7 +8,7 @@ async function main() {
   await prisma.roles_scopes.deleteMany();
   await prisma.roles.deleteMany();
   await prisma.scopes.deleteMany();
-  await prisma.posts.deleteMany();   // 👈 delete posts first
+  await prisma.posts.deleteMany();
   await prisma.users.deleteMany();
 
   console.log('Cleaned existing records');
@@ -34,7 +34,6 @@ async function main() {
     },
   });
 
-  // 🔑 new change role scope
   const changeUserRoleScope = await prisma.scopes.create({
     data: {
       action: 'CHANGE_ROLE',
@@ -55,7 +54,6 @@ async function main() {
     },
   });
 
-  // 🔑 new scopes for posts deletion
   const deleteAnyPostScope = await prisma.scopes.create({
     data: {
       action: 'DELETE',
@@ -71,6 +69,27 @@ async function main() {
       action: 'DELETE',
       module: 'posts',
       scope_text: 'delete_own_post',
+      created_on: new Date(),
+      created_by: 'system',
+    },
+  });
+
+  const getAllUsersScope = await prisma.scopes.create({
+    data: {
+      action: 'GET',
+      module: 'users',
+      scope_text: 'get_all_users',
+      created_on: new Date(),
+      created_by: 'system',
+    },
+  });
+
+  // 🔑 New Scope: Edit Post
+  const editPostScope = await prisma.scopes.create({
+    data: {
+      action: 'EDIT',
+      module: 'posts',
+      scope_text: 'edit_post',
       created_on: new Date(),
       created_by: 'system',
     },
@@ -95,14 +114,17 @@ async function main() {
       // Super User
       { role_id: superUserRole.id, scope_id: deleteUserScope.id, created_by: 'system' },
       { role_id: superUserRole.id, scope_id: promoteUserScope.id, created_by: 'system' },
-      { role_id: superUserRole.id, scope_id: changeUserRoleScope.id, created_by: 'system' }, // 👈 new scope mapping
+      { role_id: superUserRole.id, scope_id: changeUserRoleScope.id, created_by: 'system' },
       { role_id: superUserRole.id, scope_id: addPostScope.id, created_by: 'system' },
       { role_id: superUserRole.id, scope_id: deleteAnyPostScope.id, created_by: 'system' },
       { role_id: superUserRole.id, scope_id: deleteOwnPostScope.id, created_by: 'system' },
+      { role_id: superUserRole.id, scope_id: getAllUsersScope.id, created_by: 'system' },
+      { role_id: superUserRole.id, scope_id: editPostScope.id, created_by: 'system' }, // 👈 new mapping
 
       // Member
       { role_id: memberRole.id, scope_id: addPostScope.id, created_by: 'system' },
       { role_id: memberRole.id, scope_id: deleteOwnPostScope.id, created_by: 'system' },
+      { role_id: memberRole.id, scope_id: editPostScope.id, created_by: 'system' }, // 👈 new mapping
     ],
   });
 

@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
@@ -16,6 +17,7 @@ import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { PostsService } from './posts.service';
 import { AddPostDto } from './dto/add-post.dto';
 import { PaginatedPostsDto } from './dto/paginated-posts.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
 import { AddPostPipe } from './pipes/add-post.pipe';
 import { DeletePostPipe } from './pipes/delete-post.pipe';
 
@@ -74,6 +76,23 @@ export class PostsController {
         data,
       },
       `Fetched page ${dto.page_number} of posts successfully`,
+    );
+  }
+  
+  @UseGuards(AuthGuard('jwt'), ScopesGuard)
+  @Scope('posts:EDIT:edit_post')
+  @Put(':id')
+  async updatePost(
+    @Param('id') id: string,
+    @CurrentUser() user: any,
+    @Body() updatePostDto: UpdatePostDto,
+  ) {
+    const updated = await this.postsService.updatePost(id, user, updatePostDto);
+
+    return new ResponseDto(
+      'success',
+      updated,
+      `Post edited successfully`,
     );
   }
 }
