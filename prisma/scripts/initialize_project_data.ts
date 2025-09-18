@@ -4,16 +4,12 @@ import * as bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 async function main() {
-  // 1. Cleanup
   await prisma.roles_scopes.deleteMany();
   await prisma.roles.deleteMany();
   await prisma.scopes.deleteMany();
   await prisma.posts.deleteMany();
   await prisma.users.deleteMany();
 
-  console.log('Cleaned existing records');
-
-  // 2. Scopes
   const deleteUserScope = await prisma.scopes.create({
     data: {
       action: 'DELETE',
@@ -94,7 +90,6 @@ async function main() {
     },
   });
 
-  // 🔑 New Scope: Get All Posts
   const getAllPostsScope = await prisma.scopes.create({
     data: {
       action: 'GET',
@@ -107,7 +102,6 @@ async function main() {
 
   console.log('Created scopes');
 
-  // 3. Roles
   const memberRole = await prisma.roles.create({
     data: { role_name: 'Member', created_by: 'system' },
   });
@@ -116,12 +110,8 @@ async function main() {
     data: { role_name: 'Super User', created_by: 'system' },
   });
 
-  console.log('Created roles:', memberRole, superUserRole);
-
-  // 4. Role → Scope mapping
   await prisma.roles_scopes.createMany({
     data: [
-      // Super User
       { role_id: superUserRole.id, scope_id: deleteUserScope.id, created_by: 'system' },
       { role_id: superUserRole.id, scope_id: promoteUserScope.id, created_by: 'system' },
       { role_id: superUserRole.id, scope_id: changeUserRoleScope.id, created_by: 'system' },
@@ -132,7 +122,6 @@ async function main() {
       { role_id: superUserRole.id, scope_id: editPostScope.id, created_by: 'system' },
       { role_id: superUserRole.id, scope_id: getAllPostsScope.id, created_by: 'system' }, // 👈 new mapping
 
-      // Member
       { role_id: memberRole.id, scope_id: addPostScope.id, created_by: 'system' },
       { role_id: memberRole.id, scope_id: deleteOwnPostScope.id, created_by: 'system' },
       { role_id: memberRole.id, scope_id: editPostScope.id, created_by: 'system' },
@@ -140,9 +129,6 @@ async function main() {
     ],
   });
 
-  console.log('Mapped roles to scopes');
-
-  // 5. Create Super User user
   const hashedPassword = await bcrypt.hash('123456', 10);
 
   const superUser = await prisma.users.create({
@@ -159,7 +145,6 @@ async function main() {
     },
   });
 
-  console.log('Created Super User:', superUser);
 }
 
 main()

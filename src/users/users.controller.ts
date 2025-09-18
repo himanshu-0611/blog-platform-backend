@@ -27,11 +27,7 @@ export class UsersController {
   @UsePipes(DeleteUserValidationPipe)
   async deleteUser(@Param('id') id: string, @CurrentUser() user: any) {
     await this.usersService.deleteUser(id);
-    return new ResponseDto(
-      'success',
-      {},
-      `User ${id} deleted successfully by ${user.email}`,
-    );
+    return new ResponseDto('success', {}, `User is deleted successfully.`);
   }
   @UseGuards(AuthGuard('jwt'), ScopesGuard)
   @Scope('users:CHANGE_ROLE:change_role')

@@ -26,7 +26,7 @@ export class ChangeUserRoleValidationPipe implements PipeTransform {
       where: { role_name: roleName },
     });
     if (!targetRole) {
-      throw new NotFoundException(`Role "${roleName}" not found.`);
+      throw new NotFoundException(`Role "${roleName}" not found.`);``
     }
 
     const user = await this.prisma.users.findUnique({
@@ -34,7 +34,7 @@ export class ChangeUserRoleValidationPipe implements PipeTransform {
       include: { role: true },
     });
     if (!user) {
-      throw new NotFoundException(`User with id ${userId} not found.`);
+      throw new NotFoundException(`User with given id not found.`);
     }
 
     if (user.role?.role_name === roleName) {

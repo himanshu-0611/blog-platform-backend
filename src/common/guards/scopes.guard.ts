@@ -17,7 +17,6 @@ export class ScopesGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     console.log('🔐 Entering Auth Guard...');
 
-    // Get required scope(s) from decorator
     const requiredScope = this.reflector.get<string | string[]>(
       'scope',
       context.getHandler(),
@@ -25,7 +24,6 @@ export class ScopesGuard implements CanActivate {
 
     if (!requiredScope) return true;
 
-    // Normalize to array
     const requiredScopes = Array.isArray(requiredScope)
       ? requiredScope
       : [requiredScope];
@@ -37,7 +35,6 @@ export class ScopesGuard implements CanActivate {
       throw new ForbiddenException('User not authenticated');
     }
 
-    // Fetch user with role_id
     const dbUser = await this.prisma.users.findUnique({
       where: { id: user.id },
     });
@@ -46,7 +43,6 @@ export class ScopesGuard implements CanActivate {
       throw new ForbiddenException('User is not eligible to take the action');
     }
 
-    // Get all scopes for that role
     const roleScopes = await this.prisma.roles_scopes.findMany({
       where: { role_id: dbUser.role_id },
       include: { scope: true },
@@ -60,21 +56,19 @@ export class ScopesGuard implements CanActivate {
       (rs) => `${rs.scope.module}:${rs.scope.action}:${rs.scope.scope_text}`,
     );
 
-    // Check if user has at least one of the required scopes
     const hasScope = requiredScopes.some((s) => userScopes.includes(s));
 
-    console.log('🔎 Required Scopes:', requiredScopes);
-    console.log('🎯 User Scopes:', userScopes);
-    console.log('✅ Match Found:', hasScope);
+    console.log('Required Scopes:', requiredScopes);
+    console.log('User Scopes:', userScopes);
+    console.log('Match Found:', hasScope);
     if (!hasScope) {
       throw new ForbiddenException('User is not eligible to take the action');
     }
 
-    // 🔑 Extra check: if scope ends with ":own", verify ownership
     for (const scope of requiredScopes) {
-      if (scope.endsWith(':own') && userScopes.includes(scope)) {
+      if (scope.endsWith(':delete_own_post') && userScopes.includes(scope)) {
         const postId = request.params.id;
-        if (!postId) return true; // no resource id → skip
+        if (!postId) return true;
 
         const post = await this.prisma.posts.findUnique({
           where: { id: postId },

@@ -19,7 +19,7 @@ export class DeleteUserValidationPipe implements PipeTransform {
 
     if (!user || !user.is_active || user.is_archive) {
       throw new NotFoundException(
-        `Active user with id ${value} does not exist`,
+        `Active user does not exist`,
       );
     }
 

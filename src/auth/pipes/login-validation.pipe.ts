@@ -1,4 +1,3 @@
-// src/auth/pipes/login-validation.pipe.ts
 import {
   Injectable,
   PipeTransform,
@@ -25,7 +24,6 @@ export class LoginValidationPipe implements PipeTransform {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Attach user so controller/service can use it
     return { ...value, user };
   }
 }

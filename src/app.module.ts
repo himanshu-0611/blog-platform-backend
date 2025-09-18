@@ -6,17 +6,13 @@ import { PostsModule } from './posts/posts.module';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { CommonModule } from './common/common.module';
-import { RolesModule } from './roles/roles.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [
-    UsersModule,
-    PostsModule,
-    AuthModule,
-    PrismaModule,
-    CommonModule,
-    RolesModule,
-  ],
+  imports: [UsersModule, PostsModule, AuthModule, PrismaModule, CommonModule, ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),],
   controllers: [AppController],
   providers: [AppService],
 })

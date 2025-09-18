@@ -11,7 +11,7 @@ export class ResponseDto<T> {
     message: string | null = null,
     error: boolean | null = null,
   ) {
-    this.timeStamp = new Date(); // set current time
+    this.timeStamp = new Date();
     this.status = status;
     this.data = data;
     this.message = message;

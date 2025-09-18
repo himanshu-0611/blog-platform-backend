@@ -4,31 +4,45 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async create(name: string, email: string, password: string) {
-    const hashed = await bcrypt.hash(password, 10);
-
-    const memberRole = await this.prisma.roles.findFirst({
-      where: { role_name: 'Member' },
+  async create({
+    name,
+    email,
+    password,
+    roleId,
+  }: {
+    name: string;
+    email: string;
+    password: string;
+    roleId: string;
+  }) {
+    const existingUser = await this.prisma.users.findFirst({
+      where: { email, is_active: false, is_archive: true },
     });
 
-    if (!memberRole) {
-      throw new NotFoundException(
-        'Default role "Member" not found. Please seed roles first.',
-      );
+    if (existingUser) {
+      return this.prisma.users.update({
+        where: { id: existingUser.id },
+        data: {
+          name,
+          password,
+          is_active: true,
+          is_archive: false,
+          updated_on: new Date(),
+        },
+      });
     }
 
     return this.prisma.users.create({
       data: {
         name,
         email,
-        password: hashed,
-        role_id: memberRole.id,
+        password,
+        role_id: roleId,
         is_active: true,
         is_archive: false,
         created_on: new Date(),

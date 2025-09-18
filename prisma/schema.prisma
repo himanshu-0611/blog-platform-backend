@@ -79,6 +79,7 @@ model roles_scopes {
 model system_logs {
   id               String   @id @default(uuid())
   endpoint         String
+  request_type     String
   request_headers  String
   request_body     String
   response_headers String

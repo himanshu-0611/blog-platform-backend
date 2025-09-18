@@ -39,17 +39,11 @@ export class PostsService {
   }
 
   async deletePost(postId: string, user: any) {
-    const post = await this.prisma.posts.findUnique({ where: { id: postId } });
-
-    if (!post || post.is_deleted) {
-      throw new NotFoundException(`Post with id ${postId} does not exist`);
-    }
-
-    return this.prisma.posts.update({
-      where: { id: postId },
-      data: { is_deleted: true, updated_by: user.id },
-    });
-  }
+  return this.prisma.posts.update({
+    where: { id: postId },
+    data: { is_deleted: true, updated_by: user.id },
+  });
+}
 
   async getPaginatedPosts(dto: {
     page_size: number;
@@ -104,7 +98,7 @@ export class PostsService {
     const message =
       total === 0
         ? 'No Posts Available'
-        : `Fetched page ${dto.page_number} of posts successfully`;
+        : `Posts fetched successfully`;
 
     return { data, total, totalPages, message };
   }
