@@ -43,14 +43,24 @@ npm run seed
 npm run start:dev
 ```
 
-## 10. Test API in Postman
-- Example API endpoint:
+## 10. Test the API
+- This is a seeded user in DB during initilization.
 ```bash
-{{localUrl}}/blog-platform-be/v1/auth/login
+curl --location 'http://localhost:3000/blog-platform-be/v1/auth/login' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+
+  "email": "superuser@gmail.com",
+  "password": "123456"
+}'
 ```
 
+## 11. Business Logic
+- DB Schema: ![Screenshot](./assets/erdiagram.png)
+- We have 2 roles seeded in roles table: Member and Super User.
+- 1 user with role Super User is seeded in the DB with mail id superuser@gmail.com and password '123456'.
+- Super User has additional features for deleting any Member, deleting posts of any Member, as per the requirements document.
+- New Sign Up by default creates user with Member role, Super User can promote or demote the new user to and from Super User role respectively.
+- Member has limited features like deleting only his own posts.
+- Sign Up new users to create users with Member roles.
 ---
-
-**Notes**
-- Recommended: add a short note at the top specifying the required Node.js and npm versions (e.g., Node.js >= 18, npm >= 9).  
-- If any command fails, check that your `.env` DB credentials and Postgres server are correct and running.
