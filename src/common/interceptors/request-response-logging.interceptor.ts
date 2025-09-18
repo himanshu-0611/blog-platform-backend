@@ -33,7 +33,6 @@ export class RequestResponseLoggingInterceptor implements NestInterceptor {
 
     return next.handle().pipe(
       map((data) => {
-
         this.prisma.system_logs
           .create({
             data: {

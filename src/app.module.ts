@@ -9,10 +9,17 @@ import { CommonModule } from './common/common.module';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [UsersModule, PostsModule, AuthModule, PrismaModule, CommonModule, ConfigModule.forRoot({
+  imports: [
+    UsersModule,
+    PostsModule,
+    AuthModule,
+    PrismaModule,
+    CommonModule,
+    ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
-    }),],
+    }),
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

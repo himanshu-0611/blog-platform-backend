@@ -39,11 +39,11 @@ export class PostsService {
   }
 
   async deletePost(postId: string, user: any) {
-  return this.prisma.posts.update({
-    where: { id: postId },
-    data: { is_deleted: true, updated_by: user.id },
-  });
-}
+    return this.prisma.posts.update({
+      where: { id: postId },
+      data: { is_deleted: true, updated_by: user.id },
+    });
+  }
 
   async getPaginatedPosts(dto: {
     page_size: number;
@@ -96,9 +96,7 @@ export class PostsService {
 
     const totalPages = Math.ceil(total / dto.page_size);
     const message =
-      total === 0
-        ? 'No Posts Available'
-        : `Posts fetched successfully`;
+      total === 0 ? 'No Posts Available' : `Posts fetched successfully`;
 
     return { data, total, totalPages, message };
   }

@@ -56,11 +56,19 @@ curl --location 'http://localhost:3000/blog-platform-be/v1/auth/login' \
 ```
 
 ## 11. Business Logic
-- DB Schema: ![Screenshot](./assets/erdiagram.png)
+- ER Diagram: ![Screenshot](./assets/erdiagram.png)
 - We have 2 roles seeded in roles table: Member and Super User.
 - 1 user with role Super User is seeded in the DB with mail id superuser@gmail.com and password '123456'.
 - Super User has additional features for deleting any Member, deleting posts of any Member, as per the requirements document.
 - New Sign Up by default creates user with Member role, Super User can promote or demote the new user to and from Super User role respectively.
-- Member has limited features like deleting only his own posts.
+- Member has limited features like deleting only their own posts.
+  - But all these features are dynamic — if we want to allow Members to delete posts of other users, we can do so without changing backend code.
+  - If we want to remove the ability for Super Users to delete the posts of others, we can do so without backend code changes.
+  - This is made possible by user roles/scopes being assigned from the DB and not hardcoding roles for specific APIs.
 - Sign Up new users to create users with Member roles.
+- Posts are server side paginated, with search capability on title or content.
+- All users can currently be fetched only by Super User.
+  - This feature can also be given to Member role, without any backend deployent needed.
+- UUID is used as PK in tables to avoid security vulnerabilities because of using auto incremented ids.
+- system_logs table stores logs of all the request/response being processed by the system.
 ---

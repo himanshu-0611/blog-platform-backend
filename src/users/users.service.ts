@@ -7,6 +7,15 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class UsersService {
+  async findById(id: string) {
+    return this.prisma.users.findFirst({
+      where: {
+        id,
+        is_active: true,
+        is_archive: false,
+      },
+    });
+  }
   constructor(private prisma: PrismaService) {}
 
   async create({

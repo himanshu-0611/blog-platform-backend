@@ -1,4 +1,9 @@
-import { Injectable, PipeTransform, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  PipeTransform,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import * as bcrypt from 'bcrypt';

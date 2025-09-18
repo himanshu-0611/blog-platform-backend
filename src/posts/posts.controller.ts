@@ -20,7 +20,7 @@ import { PaginatedPostsDto } from './dto/paginated-posts.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { AddPostPipe } from './pipes/add-post.pipe';
 import { EditPostValidationPipe } from './pipes/edit-post.pipe';
-import { DeleteOwnPostValidationPipe } from './pipes/delete-post.pipe'; 
+import { DeleteOwnPostValidationPipe } from './pipes/delete-post.pipe';
 
 @Controller('posts')
 export class PostsController {
@@ -36,14 +36,17 @@ export class PostsController {
     return new ResponseDto(
       'success',
       createdPost,
-      `Post created successfully by user ${user.id}`,
+      `Post created successfully.`,
     );
   }
 
   @UseGuards(AuthGuard('jwt'), ScopesGuard)
   @Scope('posts:DELETE:delete_any_post')
   @Delete(':id')
-  async deletePostAny(@Param('id', DeleteOwnPostValidationPipe) post: any, @CurrentUser() user: any) {
+  async deletePostAny(
+    @Param('id', DeleteOwnPostValidationPipe) post: any,
+    @CurrentUser() user: any,
+  ) {
     return new ResponseDto(
       'success',
       this.postsService.deletePost(post.id, user),
@@ -54,7 +57,10 @@ export class PostsController {
   @UseGuards(AuthGuard('jwt'), ScopesGuard)
   @Scope('posts:DELETE:delete_own_post')
   @Delete('own/:id')
-  async deleteOwnPost(@Param('id', DeleteOwnPostValidationPipe) post: any, @CurrentUser() user: any) {
+  async deleteOwnPost(
+    @Param('id', DeleteOwnPostValidationPipe) post: any,
+    @CurrentUser() user: any,
+  ) {
     return new ResponseDto(
       'success',
       this.postsService.deletePost(post.id, user),

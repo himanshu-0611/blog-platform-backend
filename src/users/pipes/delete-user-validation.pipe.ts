@@ -18,9 +18,7 @@ export class DeleteUserValidationPipe implements PipeTransform {
     });
 
     if (!user || !user.is_active || user.is_archive) {
-      throw new NotFoundException(
-        `Active user does not exist`,
-      );
+      throw new NotFoundException(`Active user does not exist`);
     }
 
     return value;
