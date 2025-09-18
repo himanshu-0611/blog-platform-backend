@@ -100,8 +100,6 @@ async function main() {
     },
   });
 
-  console.log('Created scopes');
-
   const memberRole = await prisma.roles.create({
     data: { role_name: 'Member', created_by: 'system' },
   });
@@ -120,12 +118,12 @@ async function main() {
       { role_id: superUserRole.id, scope_id: deleteOwnPostScope.id, created_by: 'system' },
       { role_id: superUserRole.id, scope_id: getAllUsersScope.id, created_by: 'system' },
       { role_id: superUserRole.id, scope_id: editPostScope.id, created_by: 'system' },
-      { role_id: superUserRole.id, scope_id: getAllPostsScope.id, created_by: 'system' }, // 👈 new mapping
+      { role_id: superUserRole.id, scope_id: getAllPostsScope.id, created_by: 'system' },
 
       { role_id: memberRole.id, scope_id: addPostScope.id, created_by: 'system' },
       { role_id: memberRole.id, scope_id: deleteOwnPostScope.id, created_by: 'system' },
       { role_id: memberRole.id, scope_id: editPostScope.id, created_by: 'system' },
-      { role_id: memberRole.id, scope_id: getAllPostsScope.id, created_by: 'system' }, // 👈 new mapping
+      { role_id: memberRole.id, scope_id: getAllPostsScope.id, created_by: 'system' },
     ],
   });
 
@@ -144,6 +142,8 @@ async function main() {
       updated_by: 'system',
     },
   });
+
+  console.log("Data seeded successfully");
 
 }
 
